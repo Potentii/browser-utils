@@ -1,6 +1,6 @@
 {
   "name": "@potentii/browser-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Browser utilities",
   "author": "Guilherme Reginaldo Ruella <potentii@gmail.com>",
   "license": "MIT",
@@ -33,7 +33,7 @@
   "homepage": "https://github.com/Potentii/browser-utils#readme",
   
   "dependencies": {
-    "@potentii/geometry-utils": "1.0.0"
+    "@potentii/geometry-utils": "1.0.1"
   }
   
 }
