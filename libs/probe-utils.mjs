@@ -21,6 +21,7 @@ export default class ProbeUtils{
         span.style.visibility = 'hidden';
         span.style.width = 'auto';
         span.style.height = 'auto';
+        span.style.whiteSpace = 'pre-wrap';
 
         span.style.fontStyle = StyleUtils.getRenderedStyleForProperty(inputEl, 'font-style');
         span.style.letterSpacing = StyleUtils.getRenderedStyleForProperty(inputEl, 'letter-spacing');
