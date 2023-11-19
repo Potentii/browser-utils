@@ -1,4 +1,5 @@
 import {Rect, Vector2} from '@potentii/geometry-utils';
+import {MathUtils} from "@potentii/math-utils";
 
 
 export default class DomUtils{
@@ -62,6 +63,64 @@ export default class DomUtils{
 	}
 
 
+    /**
+     * Get all the parents from a given element in a list. The first is the element itself (or its direct parent if skipFirst = true), and the last is the root of the node tree.
+     * @param {HTMLElement} el
+     * @param {boolean} [skipFirst]
+     * @return {HTMLElement[]}
+     */
+    static getBackwardsLineage(el, skipFirst = false){
+        const lineage = [];
+        let currEl = skipFirst ? el?.parentElement : el;
+        if(!currEl)
+            return lineage;
+        do{
+            lineage.push(currEl);
+        } while (!!(currEl = currEl.parentElement));
+
+        return lineage;
+    }
+
+    /**
+     * Get all the parents from a given element in a set. If skipFirst = true, the element itself will not be in the set.
+     * @param {HTMLElement} el
+     * @param {boolean} [skipFirst]
+     * @return {Set<HTMLElement>}
+     */
+    static getBackwardsLineageSet(el, skipFirst = false){
+        const lineageSet = new Set();
+        let currEl = skipFirst ? el?.parentElement : el;
+        if(!currEl)
+            return lineageSet;
+        do{
+            lineageSet.add(currEl);
+        } while (!!(currEl = currEl.parentElement));
+
+        return lineageSet;
+    }
+
+
+    /**
+     * Get the first common parent of two elements, or null if there is no common parent (in the case that the elements are in different node trees).
+     * @param {HTMLElement} el1
+     * @param {HTMLElement} el2
+     * @return {?HTMLElement}
+     */
+    static getCommonParent(el1, el2){
+        if(!el1 || !el2)
+            return null;
+        if(!el1 == !el2)
+            return el1.parentElement;
+        if(el1 == el2.parentElement)
+            return el1;
+        if(el2 == el1.parentElement)
+            return el2;
+
+        const el1Parents = DomUtils.getBackwardsLineageSet(el1, false);
+        return DomUtils.getParentUsingPredicate(el2, el2Parent => el1Parents.has(el2Parent), false);
+    }
+
+
 	/**
 	 *
 	 * @param {HTMLElement} el
@@ -70,6 +129,44 @@ export default class DomUtils{
 	static getPositionOnParent(el){
 		return DomUtils.relativePosition(el, el.parentElement);
 	}
+
+
+    /**
+     * Build an elements matrix (of rows and columns) ordered by their position relative to the root element.
+     * @param {HTMLElement} root
+     * @param {string} selectorQuery
+     * @param {number} [deviation]
+     * @return {HTMLElement[][]}
+     */
+    static getElementsMatrix(root, selectorQuery, deviation = 0) {
+        const selectedItems = [...root.querySelectorAll(selectorQuery)]
+            .map(selected => ({ selected: selected, offset: DomUtils.relativePosition(selected, root) }))
+            .sort((i1, i2) => (i1.offset.x + i2.offset.y) - (i1.offset.x + i2.offset.y));
+
+        const matrix = [];
+        let row = 0;
+        let column = 0;
+        let firstItemOfCurrRow = null;
+
+        for (let item of selectedItems) {
+            if(!firstItemOfCurrRow)
+                firstItemOfCurrRow = item;
+
+            if(!MathUtils.moreOrLess(item.offset.y, firstItemOfCurrRow.offset.y, MathUtils.clamp(deviation, 0, Number.MAX_SAFE_INTEGER))){
+                row++;
+                column = 0;
+                firstItemOfCurrRow = null;
+            }
+
+            if(!matrix[row])
+                matrix[row] = [];
+
+            matrix[row][column] = item.selected;
+            column++;
+        }
+
+        return matrix;
+    }
 
 
 	/**
