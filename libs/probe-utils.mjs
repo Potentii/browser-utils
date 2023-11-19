@@ -17,7 +17,7 @@ export default class ProbeUtils{
             span.classList.add(PROBE_INPUT_VALUE_RECT_SPAN_CLASS);
         }
 
-        span.style.position = 'absolute';
+        span.style.position = 'fixed';
         span.style.visibility = 'hidden';
         span.style.width = 'auto';
         span.style.height = 'auto';
